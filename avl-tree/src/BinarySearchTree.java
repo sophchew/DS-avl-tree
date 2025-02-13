@@ -1,18 +1,18 @@
 // Java Program to Implement
 // Binary Search Tree
 
-class Node {
+class BSTNode {
     int key;
-    Node left, right;
+    BSTNode left, right;
 
-    public Node(int item) {
+    public BSTNode(int item) {
         key = item;
         left = right = null;
     }
 }
 
 class BinarySearchTree {
-    Node root;
+    BSTNode root;
 
     public BinarySearchTree() {
         root = null;
@@ -23,9 +23,9 @@ class BinarySearchTree {
         root = insertRec(root, key);
     }
 
-    Node insertRec(Node root, int key) {
+    BSTNode insertRec(BSTNode root, int key) {
         if (root == null) {
-            root = new Node(key);
+            root = new BSTNode(key);
             return root;
         }
 
@@ -42,7 +42,7 @@ class BinarySearchTree {
         root = deleteRec(root, key);
     }
 
-    Node deleteRec(Node root, int key) {
+    BSTNode deleteRec(BSTNode root, int key) {
         if (root == null)
             return root;
 
@@ -64,7 +64,7 @@ class BinarySearchTree {
         return root;
     }
 
-    int minValue(Node root) {
+    int minValue(BSTNode root) {
         int minv = root.key;
         while (root.left != null) {
             minv = root.left.key;
@@ -78,7 +78,7 @@ class BinarySearchTree {
         return searchRec(root, key);
     }
 
-    boolean searchRec(Node root, int key) {
+    boolean searchRec(BSTNode root, int key) {
         if (root == null)
             return false;
         if (root.key == key)
@@ -94,7 +94,7 @@ class BinarySearchTree {
         System.out.println("\n");
     }
 
-    void inorderRec(Node root) {
+    void inorderRec(BSTNode root) {
         if (root != null) {
             inorderRec(root.left);
             System.out.print(root.key + " ");
@@ -109,7 +109,7 @@ class BinarySearchTree {
 
     }
 
-    void preorderRec(Node root) {
+    void preorderRec(BSTNode root) {
         if (root != null) {
             System.out.print(root.key + " ");
             preorderRec(root.left);
@@ -123,7 +123,7 @@ class BinarySearchTree {
         System.out.println("\n");
     }
 
-    void postorderRec(Node root) {
+    void postorderRec(BSTNode root) {
         if (root != null) {
             postorderRec(root.left);
             postorderRec(root.right);

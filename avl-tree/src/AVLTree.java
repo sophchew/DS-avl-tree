@@ -1,14 +1,22 @@
-class AVLNode extends Node {
+class AVLNode {
     int height;
+    int key;
+    AVLNode left, right;
 
     public AVLNode(int item) {
-        super(item);
         height = 1;
+        key = item;
+        left = right = null;
     }
 }
 
-class AVLTree extends BinarySearchTree {
+class AVLTree {
     // Get height of node
+    AVLNode root;
+    public AVLTree() {
+        root = null;
+    }
+
     private int height(AVLNode node) {
         if (node == null) return 0;
         return node.height;
@@ -17,13 +25,14 @@ class AVLTree extends BinarySearchTree {
     // Get balance factor
     private int getBalance(AVLNode node) {
         if (node == null) return 0;
-        return height((AVLNode)node.left) - height((AVLNode)node.right);
+        return height(node.left) - height(node.right);
     }
 
     // Update height
     private void updateHeight(AVLNode node) {
         if (node == null) return;
-        node.height = Math.max(height((AVLNode)node.left), height((AVLNode)node.right)) + 1;
+
+        node.height = Math.max(height(node.left), height(node.right)) + 1;
     }
 
     // Rotate right
@@ -31,16 +40,16 @@ class AVLTree extends BinarySearchTree {
         // Implement right rotation
         // current becomes right child of left child
         // any left child's right children becomes left children of parent-now-child
-        Node newRoot = y.left;
-        Node existingRights = newRoot.right;
+        AVLNode newRoot = y.left;
+        AVLNode existingRights = newRoot.right;
         y.left = null;
         newRoot.right = y;
         y.left = existingRights;
         updateHeight(y);
-        updateHeight((AVLNode) existingRights);
-        updateHeight((AVLNode) newRoot);
+        updateHeight(existingRights);
+        updateHeight(newRoot);
 
-        return (AVLNode)newRoot;
+        return newRoot;
     }
 
     // Rotate left
@@ -48,71 +57,78 @@ class AVLTree extends BinarySearchTree {
         // Implement left rotation
         // current becomes left child of right child
         // any right child's left children becomes right children of parent-now-child
-        Node newRoot = x.right;
-        Node existingLefts = newRoot.left;
+        AVLNode newRoot = x.right; //11
+        AVLNode existingLefts = newRoot.left; // 0
         x.right = null;
         newRoot.left = x;
+        System.out.println(newRoot.left.key);
         x.right = existingLefts;
         updateHeight(x);
-        updateHeight((AVLNode) existingLefts);
-        updateHeight((AVLNode) newRoot);
+        updateHeight(existingLefts);
+        updateHeight(newRoot);
 
-        return (AVLNode) newRoot;
+        return newRoot;
     }
 
     // Insert
-    @Override
+
     public void insert(int key) {
-        root = insertRec((AVLNode)root, key);
+        root = insertRec(root, key);
     }
 
     private AVLNode insertRec(AVLNode node, int key) {
         // TODO: Implement AVL insert with balancing
         if(node == null) { // should only catch empty root node
-            return (AVLNode) new Node(key);
+            return new AVLNode(key);
         }
-        AVLNode currentNode = null;
+
         if(key < node.key) { // go left
             if(node.left == null) { // insert here
                 node.left = new AVLNode(key);
+                updateHeight(node);
                 return node;
             } else {
-                currentNode = (AVLNode) insertRec(node.left, key);
-                updateHeight(currentNode);
+                node.left = insertRec(node.left, key);
+                updateHeight(node);
+
             }
         } else if(key > node.key) { // go right
             if(node.right == null) {
                 node.right = new AVLNode(key);
+                updateHeight(node);
                 return node;
             } else {
-                currentNode = (AVLNode) insertRec(node.right, key);
-                updateHeight(currentNode);
-            }
-        }
-        // need to check for when key == existing key??
-        // check balance factors
-        if(getBalance(currentNode) > 1) { // right heavy
-            // check right child balance factor
-            if(getBalance((AVLNode) currentNode.right) >= 0) { // if child is right heavy or balanced, left rotation
-                currentNode = rotateLeft(currentNode);
-            } else { // left heavy, right left rotation
-                currentNode = rotateRight(currentNode);
-                currentNode = rotateLeft(currentNode);
-            }
-        } else if (getBalance(currentNode) < -1) { // left heavy
-            if(getBalance((AVLNode) currentNode.left) <= 0) { // if child is left ehavy or balanced, right rotation
-                currentNode = rotateRight(currentNode);
-            } else { // right heavy, left right rotation
-                currentNode = rotateLeft(currentNode);
-                currentNode = rotateRight(currentNode);
+                node.right = insertRec(node.right, key);// 10
+                updateHeight(node);
             }
         }
 
-        return currentNode;
+
+        // check balance factors
+        System.out.println(getBalance(node) + " " + node.key);
+        if(getBalance(node) < -1) { // right heavy
+            // check right child balance factor
+            if(getBalance(node.right) <= 0) { // if child is right heavy or balanced, left rotation
+                node = rotateLeft(node);
+            } else { // left heavy, right left rotation
+                node.right = rotateRight(node.right);
+                node = rotateLeft(node);
+                updateHeight(node);
+            }
+        } else if (getBalance(node) > 1) { // left heavy
+            if(getBalance(node.left) >= 0) { // if child is left heavy or balanced, right rotation
+                node = rotateRight(node);
+            } else { // right heavy, left right rotation
+                node.left = rotateLeft(node.left);
+                node = rotateRight(node);
+                updateHeight(node);
+            }
+        }
+
+        return node;
     }
 
     // Delete
-    @Override
     public void delete(int key) {
         root = deleteRec((AVLNode)root, key);
     }
